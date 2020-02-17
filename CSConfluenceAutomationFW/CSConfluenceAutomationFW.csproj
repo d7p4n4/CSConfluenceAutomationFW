@@ -58,6 +58,7 @@
     <Compile Include="AddNewPageResult.cs" />
     <Compile Include="ConfluenceAPIMetodusok.cs" />
     <Compile Include="ConfluenceAPIResponse.cs" />
+    <Compile Include="ConfluenceServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
