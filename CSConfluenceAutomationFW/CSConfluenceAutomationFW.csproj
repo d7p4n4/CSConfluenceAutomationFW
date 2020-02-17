@@ -60,6 +60,9 @@
     <Compile Include="ConfluenceAPIResponse.cs" />
     <Compile Include="ConfluenceServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UploadAttachmentRequest.cs" />
+    <Compile Include="UploadAttachmentResponse.cs" />
+    <Compile Include="UploadAttachmentResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

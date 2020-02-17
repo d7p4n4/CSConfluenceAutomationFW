@@ -1,4 +1,5 @@
 ﻿using AddNewPage;
+using CSConfluenceClassesFW.UploadAttachment;
 using Newtonsoft.Json;
 using System;
 using System.Configuration;
@@ -182,13 +183,15 @@ namespace CSConfluenceAutomationFW
 
         }
 
-        public async Task<string> KepFeltoltes(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, byte[] kepFajlBajtjai, string fajlNev, int idHossza)
+        public async Task<UploadAttachmentResult> KepFeltoltes(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, byte[] kepFajlBajtjai, string fajlNev, int idHossza)
         {/*
             if (oldalNeve.Equals(""))
             {
                 oldalNeve = APPSETTINGS_OLDALNEVE;
             }
             */
+            UploadAttachmentResult uploadAttachmentResult = new UploadAttachmentResult();
+
             ByteArrayContent kepByteTomb = new ByteArrayContent(kepFajlBajtjai);
 
             string oldalAzonositoja = GetOldalIDNevAlapjan(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve, idHossza);
@@ -207,12 +210,32 @@ namespace CSConfluenceAutomationFW
                     request.Content = multipartContent;
 
                     var response = await httpClient.SendAsync(request);
-                    return response.Content.ReadAsStringAsync().Result;
+                    string result = response.Content.ReadAsStringAsync().Result;
+
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        UploadAttachmentSuccessResponse JSONObjSuccess = new UploadAttachmentSuccessResponse();
+                        JSONObjSuccess = JsonConvert.DeserializeObject<UploadAttachmentSuccessResponse>(result);
+
+                        uploadAttachmentResult.SuccessResponse = JSONObjSuccess;
+                    }
+                    else
+                    {
+
+                        UploadAttachmentFailedResponse JSONObjFailed = new UploadAttachmentFailedResponse();
+                        JSONObjFailed = JsonConvert.DeserializeObject<UploadAttachmentFailedResponse>(result);
+
+                        uploadAttachmentResult.FailedResponse = JSONObjFailed;
+
+                    }
+
+                    return uploadAttachmentResult;
                 }
             }
         }
 
-        public async Task<string> Kepfeltoltes(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, string kepFajlBase64, string fajlNev, int idHossza)
+        public async Task<UploadAttachmentResult> UploadAttachment(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, string kepFajlBase64, string fajlNev, int idHossza)
         {
 
             return await KepFeltoltes(
