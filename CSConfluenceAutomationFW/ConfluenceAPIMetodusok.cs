@@ -41,7 +41,11 @@ namespace CSConfluenceAutomationFW
         {
             DeletePageResult deletePageResult = new DeletePageResult();
 
-            string oldalAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results[0].Id.ToString();
+            string oldalAzonosito = "0";
+            if (GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results.Count > 0)
+            {
+                oldalAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results[0].Id.ToString();
+            }
 
             using (var httpClient = new HttpClient())
             {
@@ -81,7 +85,11 @@ namespace CSConfluenceAutomationFW
         {
             IsPageExistsResult isPageExistsResult = new IsPageExistsResult();
 
-            string oldalAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, cim).SuccessResponse.Results[0].Id.ToString();
+            string oldalAzonosito = "0";
+            if(GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, cim).SuccessResponse.Results.Count > 0)
+            {
+                oldalAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, cim).SuccessResponse.Results[0].Id.ToString();
+            }
 
             try
             {
@@ -134,7 +142,11 @@ namespace CSConfluenceAutomationFW
 
             html = html.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace("\"", "'");
 
-            string szuloOsztalyAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, szuloOsztalyNeve).SuccessResponse.Results[0].Id.ToString();
+            string szuloOsztalyAzonosito = "0";
+            if (GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, szuloOsztalyNeve).SuccessResponse.Results.Count > 0)
+            {
+                szuloOsztalyAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, szuloOsztalyNeve).SuccessResponse.Results[0].Id.ToString();
+            }
 
             string DATA = "{\"type\":\"page\",\"ancestors\":[{\"type\":\"page\",\"id\":" + szuloOsztalyAzonosito +
                 "}],\"title\":\"" + cim + "\",\"space\":{\"key\":\"" + terAzonosito + "\"},\"body\":{\"storage\":{\"value\":\""
@@ -180,7 +192,11 @@ namespace CSConfluenceAutomationFW
 
             ByteArrayContent kepByteTomb = new ByteArrayContent(kepFajlBajtjai);
 
-            string oldalAzonositoja = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results[0].Id.ToString();
+            string oldalAzonositoja = "0";
+            if (GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results.Count > 0)
+            {
+                oldalAzonositoja = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results[0].Id.ToString();
+            }
 
             using (var httpClient = new HttpClient())
             {

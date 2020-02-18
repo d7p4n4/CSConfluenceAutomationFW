@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CSConfluenceAutomationFW
 {
-    class AddNewPageResponse : Ac4yServiceResponse
+    public class AddNewPageResponse : Ac4yServiceResponse
     {
         public AddNewPageResult AddNewPageResult { get; set; }
     }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CSConfluenceAutomationFW
 {
-    class AddNewPageRequest : Ac4yServiceRequest
+    public class AddNewPageRequest : Ac4yServiceRequest
     {
         public string Password { get; set; }
         public string Username { get; set; }

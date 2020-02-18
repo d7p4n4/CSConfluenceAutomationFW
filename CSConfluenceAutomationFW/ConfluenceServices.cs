@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CSConfluenceAutomationFW
 {
-    class ConfluenceServices
+    public class ConfluenceServices
     {
         public AddNewPageResponse AddNewPage(AddNewPageRequest request)
         {
@@ -83,7 +83,7 @@ namespace CSConfluenceAutomationFW
 
         }//GetIdByTitle
 
-        public IsPageExistsResponse AddNewPage(IsPageExistsRequest request)
+        public IsPageExistsResponse IsPageExists(IsPageExistsRequest request)
         {
             IsPageExistsResponse response = new IsPageExistsResponse();
 
@@ -127,6 +127,6 @@ namespace CSConfluenceAutomationFW
                 response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
             }
             return response;
-        }//IsPageExists
+        }//DeletePage
     }
 }
