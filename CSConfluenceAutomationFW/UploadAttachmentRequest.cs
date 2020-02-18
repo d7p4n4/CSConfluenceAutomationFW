@@ -16,6 +16,5 @@ namespace CSConfluenceAutomationFW
         public string PageTitle { get; set; }
         public string FileName { get; set; }
         public string ImageFileBase64String { get; set; }
-        public int IdLength { get; set; }
     }
 }

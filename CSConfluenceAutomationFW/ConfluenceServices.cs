@@ -24,7 +24,6 @@ namespace CSConfluenceAutomationFW
                         , request.URL
                         , request.Username
                         , request.Password
-                        , request.IdLength
                         );
                 response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
             }
@@ -50,7 +49,6 @@ namespace CSConfluenceAutomationFW
                         , request.PageTitle
                         , request.ImageFileBase64String
                         , request.FileName
-                        , request.IdLength
                         );
                 response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
             }
@@ -59,8 +57,54 @@ namespace CSConfluenceAutomationFW
                 response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
             }
             return response;
-        }//AddNewPage
+        }//UploadAttachment
 
+        public GetIdByTitleResponse GetIdByTitle(GetIdByTitleRequest request)
+        {
+            GetIdByTitleResponse response = new GetIdByTitleResponse();
+
+            try
+            {
+                response.GetIdByTitleResult = 
+                    new ConfluenceAPIMetodusok().GetIdByTitle(
+                        request.Username
+                        , request.Password
+                        , request.SpaceKey
+                        , request.URL
+                        , request.PageTitle
+                        );
+                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+
+        }//GetIdByTitle
+
+        public IsPageExistsResponse AddNewPage(IsPageExistsRequest request)
+        {
+            IsPageExistsResponse response = new IsPageExistsResponse();
+
+            try
+            {
+                response.IsPageExistsResult =
+                    new ConfluenceAPIMetodusok().IsPageExists(
+                        request.URL
+                        , request.PageTitle
+                        , request.SpaceKey
+                        , request.Username
+                        , request.Password
+                        );
+                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+        }//IsPageExists
 
     }
 }

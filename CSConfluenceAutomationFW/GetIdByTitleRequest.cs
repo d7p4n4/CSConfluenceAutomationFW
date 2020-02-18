@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace CSConfluenceAutomationFW
 {
-    class AddNewPageRequest : Ac4yServiceRequest
+    public class GetIdByTitleRequest : Ac4yServiceRequest
     {
         public string Password { get; set; }
         public string Username { get; set; }
         public string URL { get; set; }
         public string SpaceKey { get; set; }
         public string PageTitle { get; set; }
-        public string ParentPageTitle { get; set; }
-        public string Content { get; set; }
+
     }
 }

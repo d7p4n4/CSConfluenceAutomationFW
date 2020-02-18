@@ -1,4 +1,6 @@
 ﻿using AddNewPage;
+using CSConfluenceClassesFW.GetIdByTitle;
+using CSConfluenceClassesFW.IsPageExists;
 using CSConfluenceClassesFW.UploadAttachment;
 using Newtonsoft.Json;
 using System;
@@ -37,7 +39,7 @@ namespace CSConfluenceAutomationFW
         public string DeletePage(string jelszo, string felhasznaloNev, string URL, string oldalNeve, string terAzonosito, int idHossza)
         {
 
-            string oldalAzonosito = GetOldalIDNevAlapjan(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve, idHossza);
+            string oldalAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results[0].Id.ToString();
 
             using (var httpClient = new HttpClient())
             {
@@ -56,10 +58,11 @@ namespace CSConfluenceAutomationFW
             }
         }
 
-        public bool IsPageExists(string URL, string cim, string terAzonosito, string felhasznaloNev, string jelszo, int idHossza)
+        public IsPageExistsResult IsPageExists(string URL, string cim, string terAzonosito, string felhasznaloNev, string jelszo)
         {
+            IsPageExistsResult isPageExistsResult = new IsPageExistsResult();
 
-            string oldalAzonosito = GetOldalIDNevAlapjan(felhasznaloNev, jelszo, terAzonosito, URL, cim, idHossza);
+            string oldalAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, cim).SuccessResponse.Results[0].Id.ToString();
 
             try
             {
@@ -67,7 +70,7 @@ namespace CSConfluenceAutomationFW
             }
             catch (Exception exception)
             {
-                return false;
+                return isPageExistsResult;
             }
 
             bool eredmeny = false;
@@ -82,40 +85,37 @@ namespace CSConfluenceAutomationFW
                     HttpResponseMessage message = httpClient.SendAsync(request).Result;
                     string description = string.Empty;
                     string result = message.Content.ReadAsStringAsync().Result;
-                    description = result;
 
-                    ConfluenceAPIResponse JSONObj = new ConfluenceAPIResponse();
-                    JSONObj = JsonConvert.DeserializeObject<ConfluenceAPIResponse>(result);
-                    if (JSONObj.statusCode == null)
+                    if (message.IsSuccessStatusCode)
                     {
-                        eredmeny = true;
+                        IsPageExistsSuccessResponse JSONObjSuccess = new IsPageExistsSuccessResponse();
+                        JSONObjSuccess = JsonConvert.DeserializeObject<IsPageExistsSuccessResponse>(result);
+
+                        isPageExistsResult.SuccessResponse = JSONObjSuccess;
                     }
+                    else
+                    {
+
+                        IsPageExistsFailedResponse JSONObjFailed = new IsPageExistsFailedResponse();
+                        JSONObjFailed = JsonConvert.DeserializeObject<IsPageExistsFailedResponse>(result);
+
+                        isPageExistsResult.FailedResponse = JSONObjFailed;
+
+                    }
+
+                    return isPageExistsResult;
                 }
             }
-            return eredmeny;
 
         }
 
-        public AddNewPageResult AddConfluencePage(string cim, string terAzonosito, string szuloOsztalyNeve, string html, string URL, string felhasznaloNev, string jelszo, int idHossza)
+        public AddNewPageResult AddConfluencePage(string cim, string terAzonosito, string szuloOsztalyNeve, string html, string URL, string felhasznaloNev, string jelszo)
         {
             AddNewPageResult addNewPageResult = new AddNewPageResult();
-            /*
-            if (szuloOsztalyNeve.Equals(""))
-            {
-                szuloOsztalyNeve = APPSETTINGS_SZULOOSZTALYNEVE;
-            }
-            if (terAzonosito.Equals(""))
-            {
-                terAzonosito = APPSETTINGS_TERAZONOSITO;
-            }
-            if (cim.Equals(""))
-            {
-                cim = APPSETTINGS_OLDALNEVE;
-            }
-            */
+
             html = html.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace("\"", "'");
 
-            string szuloOsztalyAzonosito = GetOldalIDNevAlapjan(felhasznaloNev, jelszo, terAzonosito, URL, szuloOsztalyNeve, idHossza);
+            string szuloOsztalyAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, szuloOsztalyNeve).SuccessResponse.Results[0].Id.ToString();
 
             string DATA = "{\"type\":\"page\",\"ancestors\":[{\"type\":\"page\",\"id\":" + szuloOsztalyAzonosito +
                 "}],\"title\":\"" + cim + "\",\"space\":{\"key\":\"" + terAzonosito + "\"},\"body\":{\"storage\":{\"value\":\""
@@ -154,16 +154,12 @@ namespace CSConfluenceAutomationFW
 
         }
 
-        public string UpdateConfluencePage(string cim, string terAzonosito, string html, string URL, string felhasznaloNev, string jelszo, string verzioSzam, int idHossza)
-        {/*
-            if (cim.Equals(""))
-            {
-                cim = APPSETTINGS_OLDALNEVE;
-            }
-            */
+        public string UpdateConfluencePage(string cim, string terAzonosito, string html, string URL, string felhasznaloNev, string jelszo, string verzioSzam)
+        {
+
             html = html.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace("\"", "'");
 
-            string oldalAzonositoja = GetOldalIDNevAlapjan(felhasznaloNev, jelszo, terAzonosito, URL, cim, idHossza);
+            string oldalAzonositoja = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, cim).SuccessResponse.Results[0].Id.ToString();
 
             string DATA = "{\"version\":{\"number\":" + verzioSzam + "},\"title\":\"" + cim + "\",\"type\":\"page\",\"body\"" +
                 ":{\"storage\":{\"value\":\"" + html + "\",\"representation\":\"storage\"}}}";
@@ -183,18 +179,15 @@ namespace CSConfluenceAutomationFW
 
         }
 
-        public async Task<UploadAttachmentResult> KepFeltoltes(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, byte[] kepFajlBajtjai, string fajlNev, int idHossza)
-        {/*
-            if (oldalNeve.Equals(""))
-            {
-                oldalNeve = APPSETTINGS_OLDALNEVE;
-            }
-            */
+        public async Task<UploadAttachmentResult> KepFeltoltes(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, byte[] kepFajlBajtjai, string fajlNev)
+        {
+
             UploadAttachmentResult uploadAttachmentResult = new UploadAttachmentResult();
 
             ByteArrayContent kepByteTomb = new ByteArrayContent(kepFajlBajtjai);
 
-            string oldalAzonositoja = GetOldalIDNevAlapjan(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve, idHossza);
+            string oldalAzonositoja = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results[0].Id.ToString();
+
             using (var httpClient = new HttpClient())
             {
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), URL + "/" + oldalAzonositoja + "/child/attachment"))
@@ -235,7 +228,7 @@ namespace CSConfluenceAutomationFW
             }
         }
 
-        public async Task<UploadAttachmentResult> UploadAttachment(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, string kepFajlBase64, string fajlNev, int idHossza)
+        public async Task<UploadAttachmentResult> UploadAttachment(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, string kepFajlBase64, string fajlNev)
         {
 
             return await KepFeltoltes(
@@ -246,13 +239,13 @@ namespace CSConfluenceAutomationFW
                 , oldalNeve
                 , Convert.FromBase64String(kepFajlBase64)
                 , fajlNev
-                , idHossza
                 );
         }
 
-        public string GetOldalIDNevAlapjan(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve, int idHossza)
+        public GetIdByTitleResult GetIdByTitle(string felhasznaloNev, string jelszo, string terAzonosito, string URL, string oldalNeve)
         {
-            string eredmeny = "";
+            GetIdByTitleResult getIdByTitleResult = new GetIdByTitleResult();
+
             using (var httpClient = new HttpClient())
             {
                 using (var request = new HttpRequestMessage(new HttpMethod("GET"), URL + "?title=" + oldalNeve + "&spaceKey=" + terAzonosito + "&expand=history"))
@@ -260,16 +253,30 @@ namespace CSConfluenceAutomationFW
                     var base64authorization = Convert.ToBase64String(Encoding.ASCII.GetBytes(felhasznaloNev + ":" + jelszo));
                     request.Headers.TryAddWithoutValidation("Authorization", $"Basic {base64authorization}");
 
-                    //var response = await httpClient.SendAsync(request).Result;
                     HttpResponseMessage message = httpClient.SendAsync(request).Result;
                     string description = string.Empty;
                     string result = message.Content.ReadAsStringAsync().Result;
-                    description = result;
 
-                    eredmeny = result.Replace("{\"results\":[{\"id\":\"", "").Substring(0, idHossza);
+                    if (message.IsSuccessStatusCode)
+                    {
+                        GetIdByTitleSuccessResponse JSONObjSuccess = new GetIdByTitleSuccessResponse();
+                        JSONObjSuccess = JsonConvert.DeserializeObject<GetIdByTitleSuccessResponse>(result);
+
+                        getIdByTitleResult.SuccessResponse = JSONObjSuccess;
+                    }
+                    else
+                    {
+
+                        GetIdByTitleFailedResponse JSONObjFailed = new GetIdByTitleFailedResponse();
+                        JSONObjFailed = JsonConvert.DeserializeObject<GetIdByTitleFailedResponse>(result);
+
+                        getIdByTitleResult.FailedResponse = JSONObjFailed;
+
+                    }
+
+                    return getIdByTitleResult;
                 }
             }
-            return eredmeny;
 
         }
 
