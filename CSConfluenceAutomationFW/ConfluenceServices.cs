@@ -128,5 +128,53 @@ namespace CSConfluenceAutomationFW
             }
             return response;
         }//DeletePage
+
+        public AddNewPageKompozitResponse AddNewPageKompozit(AddNewPageKompozitRequest request)
+        {
+            AddNewPageKompozitResponse response = new AddNewPageKompozitResponse();
+
+            try
+            {
+                response.IsPageExistsResult =
+                    new ConfluenceAPIMetodusok().IsPageExists(
+                        request.URL
+                        , request.PageTitle
+                        , request.SpaceKey
+                        , request.Username
+                        , request.Password
+                        );
+
+                if(response.IsPageExistsResult.FailedResponse == null)
+                {
+                    response.DeletePageResult =
+                        new ConfluenceAPIMetodusok().DeletePage(
+                            request.Password
+                            , request.Username
+                            , request.URL
+                            , request.PageTitle
+                            , request.SpaceKey
+                            );
+                }
+
+                response.AddNewPageResult =
+                    new ConfluenceAPIMetodusok().AddConfluencePage(
+                        request.PageTitle
+                        , request.SpaceKey
+                        , request.ParentPageTitle
+                        , request.Content
+                        , request.URL
+                        , request.Username
+                        , request.Password
+                        ); 
+                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+        }//AddNewPageKompozit
+
+
     }
 }
