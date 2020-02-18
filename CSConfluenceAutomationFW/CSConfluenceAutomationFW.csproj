@@ -57,8 +57,10 @@
     <Compile Include="AddNewPageResponse.cs" />
     <Compile Include="AddNewPageResult.cs" />
     <Compile Include="ConfluenceAPIMetodusok.cs" />
-    <Compile Include="ConfluenceAPIResponse.cs" />
     <Compile Include="ConfluenceServices.cs" />
+    <Compile Include="DeletePageRequest.cs" />
+    <Compile Include="DeletePageResponse.cs" />
+    <Compile Include="DeletePageResult.cs" />
     <Compile Include="GetIdByTitleRequest.cs" />
     <Compile Include="GetIdByTitleResponse.cs" />
     <Compile Include="GetIdByTitleResult.cs" />

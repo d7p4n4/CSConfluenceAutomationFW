@@ -1,4 +1,5 @@
 ﻿using AddNewPage;
+using CSConfluenceClassesFW.DeletePage;
 using CSConfluenceClassesFW.GetIdByTitle;
 using CSConfluenceClassesFW.IsPageExists;
 using CSConfluenceClassesFW.UploadAttachment;
@@ -36,8 +37,9 @@ namespace CSConfluenceAutomationFW
             return results.ToString();
         }
 
-        public string DeletePage(string jelszo, string felhasznaloNev, string URL, string oldalNeve, string terAzonosito, int idHossza)
+        public DeletePageResult DeletePage(string jelszo, string felhasznaloNev, string URL, string oldalNeve, string terAzonosito)
         {
+            DeletePageResult deletePageResult = new DeletePageResult();
 
             string oldalAzonosito = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, oldalNeve).SuccessResponse.Results[0].Id.ToString();
 
@@ -52,8 +54,25 @@ namespace CSConfluenceAutomationFW
                     HttpResponseMessage message = httpClient.SendAsync(request).Result;
                     string description = string.Empty;
                     string result = message.Content.ReadAsStringAsync().Result;
-                    description = result;
-                    return result;
+
+                    if (message.IsSuccessStatusCode)
+                    {
+                        DeletePageSuccessResponse JSONObjSuccess = new DeletePageSuccessResponse();
+                        JSONObjSuccess = JsonConvert.DeserializeObject<DeletePageSuccessResponse>(result);
+
+                        deletePageResult.SuccessResponse = JSONObjSuccess;
+                    }
+                    else
+                    {
+
+                        DeletePageFailedResponse JSONObjFailed = new DeletePageFailedResponse();
+                        JSONObjFailed = JsonConvert.DeserializeObject<DeletePageFailedResponse>(result);
+
+                        deletePageResult.FailedResponse = JSONObjFailed;
+
+                    }
+
+                    return deletePageResult;
                 }
             }
         }
@@ -151,31 +170,6 @@ namespace CSConfluenceAutomationFW
             }
 
             return addNewPageResult;
-
-        }
-
-        public string UpdateConfluencePage(string cim, string terAzonosito, string html, string URL, string felhasznaloNev, string jelszo, string verzioSzam)
-        {
-
-            html = html.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace("\"", "'");
-
-            string oldalAzonositoja = GetIdByTitle(felhasznaloNev, jelszo, terAzonosito, URL, cim).SuccessResponse.Results[0].Id.ToString();
-
-            string DATA = "{\"version\":{\"number\":" + verzioSzam + "},\"title\":\"" + cim + "\",\"type\":\"page\",\"body\"" +
-                ":{\"storage\":{\"value\":\"" + html + "\",\"representation\":\"storage\"}}}";
-
-            System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
-            client.BaseAddress = new System.Uri(URL + "/" + oldalAzonositoja);
-            byte[] cred = UTF8Encoding.UTF8.GetBytes(felhasznaloNev + ":" + jelszo);
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(cred));
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-            System.Net.Http.HttpContent content = new StringContent(DATA, UTF8Encoding.UTF8, "application/json");
-
-            HttpResponseMessage message = client.PutAsync(URL + "/" + oldalAzonositoja, content).Result;
-            string description = string.Empty;
-            string result = message.Content.ReadAsStringAsync().Result;
-            return result;
 
         }
 

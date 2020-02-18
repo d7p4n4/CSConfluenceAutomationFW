@@ -106,5 +106,27 @@ namespace CSConfluenceAutomationFW
             return response;
         }//IsPageExists
 
+        public DeletePageResponse DeletePage(DeletePageRequest request)
+        {
+            DeletePageResponse response = new DeletePageResponse();
+
+            try
+            {
+                response.DeletePageResult =
+                    new ConfluenceAPIMetodusok().DeletePage(
+                        request.Password
+                        , request.Username
+                        , request.URL
+                        , request.PageTitle
+                        , request.SpaceKey
+                        );
+                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+        }//IsPageExists
     }
 }
